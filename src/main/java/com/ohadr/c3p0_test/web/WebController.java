@@ -21,22 +21,6 @@ public class WebController
     private Manager manager;
 
 
-    /**
-     * 
-     * @param workoutName
-     * @param response
-     * @throws IOException
-     * /
-    @RequestMapping(value = "/secured/getSortedTraineesByGradePerWorkout", method = RequestMethod.GET)
-    protected void getSortedTraineesByGrade(
-    		@RequestParam String workoutName,
-            HttpServletResponse response) throws IOException 
-    {
-    	Collection<ITrainee> trainees = manager.getSortedTraineesByGradePerWorkout( workoutName );
-    	String jsonResponse = Utils.convertToJson( trainees );
-    	response.getWriter().println( jsonResponse );
-    }*/
-
     @RequestMapping(value = "/getAllWorkoutsNames", method = RequestMethod.GET)
     protected void getAllWorkoutsNames(
     		HttpServletResponse response) throws Exception
