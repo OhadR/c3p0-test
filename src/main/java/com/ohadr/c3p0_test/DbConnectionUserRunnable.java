@@ -35,6 +35,7 @@ public class DbConnectionUserRunnable implements Runnable
 		Connection connection = null;
 		connection = dataSource.getConnection();
 
+		String sql = "SELECT * FROM SERVICES";
 
 		CallableStatement statement = null;
 		statement = connection.prepareCall(sql);
