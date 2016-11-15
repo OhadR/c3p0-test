@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.ohadr.c3p0_test.Manager;
 
 
@@ -21,11 +22,12 @@ public class WebController
     private Manager manager;
 
 
-    @RequestMapping(value = "/getAllWorkoutsNames", method = RequestMethod.GET)
+    @RequestMapping(value = "/runThreads", method = RequestMethod.GET)
     protected void getAllWorkoutsNames(
+            @RequestParam int numThreads,
     		HttpServletResponse response) throws Exception
     {
-    	manager.runThreads(1000);
+    	manager.runThreads(numThreads);
     	String jsonResponse = "ohads";
     	response.getWriter().println( jsonResponse );    	
     }
