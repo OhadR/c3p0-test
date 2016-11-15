@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context
+							http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/security 
+							http://www.springframework.org/schema/security/spring-security-3.2.xsd
+						http://www.springframework.org/schema/mvc
+							http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+
+	<context:annotation-config />
+
+	<context:property-placeholder location="classpath:client.properties" />
+	
+	<context:component-scan base-package="com.ohadr.cbenchmarkr" />
+	<context:component-scan base-package="com.ohadr.auth_flows" />
+	<context:component-scan base-package="com.ohadr.crypto" />
+	
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://${MARS_DB_HOST}:3306/${MARS_DB_NAME}?allowMultiQueries=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="${MARS_DB_USER}" />
+		<property name="password" value="${MARS_DB_PASSWORD}" />
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="100" />
+		<property name="maxStatements" value="0" />
+		<property name="idleConnectionTestPeriod" value="100" />
+		<property name="checkoutTimeout" value="20000" />
+		<property name="forceSynchronousCheckins" value="true" />
+		<property name="dataSourceName" value="springBatchDataSource" />
+	</bean>
+
+
+</beans>
