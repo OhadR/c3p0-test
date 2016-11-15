@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 public class DbConnectionUserRunnable implements Runnable 
 {
 	private DataSource dataSource;
+	private Connection connection;
 
 	public DbConnectionUserRunnable(DataSource dataSource)
 	{
@@ -20,21 +21,31 @@ public class DbConnectionUserRunnable implements Runnable
 	{
 		try
 		{
-			executeQuery();
+			connection = dataSource.getConnection();
+			ResultSet rs = executeQuery();
 		}
 		catch (SQLException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		finally
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 	}
 	
 	private ResultSet executeQuery() throws SQLException
 	{
-		Connection connection = null;
-		connection = dataSource.getConnection();
-
 		String sql = "SELECT * FROM SERVICES";
 
 		CallableStatement statement = null;
