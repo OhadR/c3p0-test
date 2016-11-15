@@ -1,5 +1,6 @@
 package com.ohadr.c3p0_test;
 
+import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Component;
 public class Manager implements InitializingBean
 {
 	private static Logger log = Logger.getLogger(Manager.class);
+
+	@Autowired
+	private DataSource  dataSource;
 
     
 
@@ -27,7 +31,7 @@ public class Manager implements InitializingBean
 	{
 		for(int i = 0 ; i < numThreads; ++i)
 		{
-			Thread t = new Thread(new DbConnectionUserRunnable());
+			Thread t = new Thread(new DbConnectionUserRunnable(dataSource));
 			t.start();
 		}
 	}
