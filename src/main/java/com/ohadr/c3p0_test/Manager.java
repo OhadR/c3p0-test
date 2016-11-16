@@ -1,11 +1,13 @@
 package com.ohadr.c3p0_test;
 
+import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 
 @Component
@@ -29,11 +31,50 @@ public class Manager implements InitializingBean
 
 	public void runThreads(int numThreads) 
 	{
+		log.info("running " + numThreads + " threads...");
 		for(int i = 0 ; i < numThreads; ++i)
 		{
 			Thread t = new Thread(new DbConnectionUserRunnable(dataSource));
 			t.start();
 		}
 	}
+
+
+	private static ConnectionPoolStatus getConnectionPoolStatus(ComboPooledDataSource comboPooledDataSource)
+	{
+		ConnectionPoolStatus connectionPoolStatus = new ConnectionPoolStatus();
+		try
+		{
+			connectionPoolStatus.numBusyConnections = comboPooledDataSource.getNumBusyConnections();
+			connectionPoolStatus.numBusyConnectionsAllUsers = comboPooledDataSource.getNumBusyConnectionsAllUsers();
+
+			connectionPoolStatus.numIdleConnections = comboPooledDataSource.getNumIdleConnections();
+			connectionPoolStatus.numIdleConnectionsAllUsers = comboPooledDataSource.getNumIdleConnectionsAllUsers();
+
+			connectionPoolStatus.numConnections = comboPooledDataSource.getNumConnections();
+			connectionPoolStatus.numConnectionsAllUsers = comboPooledDataSource.getNumConnectionsAllUsers();
+			
+			connectionPoolStatus.numThreadsAwaitingCheckoutDefaultUser = comboPooledDataSource.getNumThreadsAwaitingCheckoutDefaultUser();
+			
+			connectionPoolStatus.numUnclosedOrphanedConnections = comboPooledDataSource.getNumUnclosedOrphanedConnections();
+		}
+		catch (SQLException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		return connectionPoolStatus;
+		
+	}
+
+
+	public ConnectionPoolStatus getDataSourceStatus()
+	{
+		ComboPooledDataSource comboPooledDataSource = (ComboPooledDataSource)dataSource;
+		return getConnectionPoolStatus(comboPooledDataSource);
+		
+	}	
+	
 
 }

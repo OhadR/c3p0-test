@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.ohadr.c3p0_test.ConnectionPoolStatus;
 import com.ohadr.c3p0_test.Manager;
 
 
@@ -39,4 +40,13 @@ public class WebController
 		log.info( "got to ping" );
 		response.getWriter().println("ping response: pong");
 	}
+    
+    @RequestMapping(value = "/getStatus", method = RequestMethod.GET)
+    protected void getDataSourceStatus(
+    		HttpServletResponse response) throws Exception
+    {
+    	ConnectionPoolStatus status = manager.getDataSourceStatus();
+    	response.getWriter().println( status );    	
+    }
+    
 }
