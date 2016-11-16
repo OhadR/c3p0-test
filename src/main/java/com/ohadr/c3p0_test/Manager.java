@@ -45,6 +45,7 @@ public class Manager implements InitializingBean
 		ConnectionPoolStatus connectionPoolStatus = new ConnectionPoolStatus();
 		try
 		{
+			connectionPoolStatus.dataSourceName = comboPooledDataSource.getDataSourceName();
 			connectionPoolStatus.numBusyConnections = comboPooledDataSource.getNumBusyConnections();
 			connectionPoolStatus.numBusyConnectionsAllUsers = comboPooledDataSource.getNumBusyConnectionsAllUsers();
 
