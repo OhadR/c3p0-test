@@ -1,7 +1,6 @@
 package com.ohadr.c3p0_test.web;
 
-import java.io.IOException;
-
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -10,8 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ohadr.c3p0_test.ConnectionPoolStatus;
 import com.ohadr.c3p0_test.Manager;
+import com.ohadr.common.types.c3p0.ConnectionPoolStatus;
+import com.ohadr.common.types.c3p0.ConnectionPoolStatusCollection;
+import com.ohadr.common.utils.JsonUtils;
 
 
 @Controller
@@ -41,12 +42,16 @@ public class WebController
 		response.getWriter().println("ping response: pong");
 	}
     
-    @RequestMapping(value = "/getStatus", method = RequestMethod.GET)
+    @RequestMapping(value = "/connPoolStatus", method = RequestMethod.GET)
     protected void getDataSourceStatus(
     		HttpServletResponse response) throws Exception
     {
     	ConnectionPoolStatus status = manager.getDataSourceStatus();
-    	response.getWriter().println( status );    	
+    	ConnectionPoolStatusCollection coll = new ConnectionPoolStatusCollection();
+    	coll.collection = new ArrayList<ConnectionPoolStatus>();
+    	coll.collection.add(status);
+    	String statusJson = JsonUtils.convertToJson(coll);
+    	response.getWriter().println( statusJson );    	
     }
     
 }

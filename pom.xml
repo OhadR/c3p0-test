@@ -96,10 +96,10 @@
 
         
         <dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.1</version>
-		</dependency>
+			<groupId>com.ohadr</groupId>
+			<artifactId>ohadr.commons</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+        </dependency>
         		
 		<dependency>
 			<groupId>com.mchange</groupId>

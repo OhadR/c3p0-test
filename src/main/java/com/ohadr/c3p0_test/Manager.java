@@ -5,9 +5,9 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.ohadr.common.types.c3p0.ConnectionPoolStatus;
 
 
 @Component
