@@ -31,6 +31,7 @@
 		<property name="checkoutTimeout" value="20000" />
 		<!-- property name="maxIdleTime" value="20000" /-->
 		<!-- property name="forceSynchronousCheckins" value="true" /-->
+		<property name="maxIdleTimeExcessConnections" value="30" />
 		<property name="dataSourceName" value="myDataSource" />
 	</bean>
 
