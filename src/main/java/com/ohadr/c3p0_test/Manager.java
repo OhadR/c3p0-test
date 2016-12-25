@@ -15,6 +15,8 @@ public class Manager implements InitializingBean
 {
 	private static Logger log = Logger.getLogger(Manager.class);
 
+	private final int THREAD_SLEEP_TIME_SECONDS = 15;
+
 	@Autowired
 	private DataSource  dataSource;
 
@@ -31,12 +33,13 @@ public class Manager implements InitializingBean
 
 	public void runThreads(int numThreads) 
 	{
-		log.info("running " + numThreads + " threads...");
+		log.info("running " + numThreads + " threads, each one sleeps " + THREAD_SLEEP_TIME_SECONDS + " secs...");
 		for(int i = 0 ; i < numThreads; ++i)
 		{
-			Thread t = new Thread(new DbConnectionUserRunnable(dataSource));
+			Thread t = new Thread(new DbConnectionUserRunnable(dataSource, THREAD_SLEEP_TIME_SECONDS));
 			t.start();
 		}
+		log.info(numThreads + " threads have started.");
 	}
 
 
