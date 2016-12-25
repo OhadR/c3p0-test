@@ -29,9 +29,8 @@
 		<property name="maxStatements" value="0" />
 		<property name="idleConnectionTestPeriod" value="100" />
 		<property name="checkoutTimeout" value="20000" />
-		<!-- property name="maxIdleTime" value="20000" /-->
-		<!-- property name="forceSynchronousCheckins" value="true" /-->
 		<property name="maxIdleTimeExcessConnections" value="30" />
+		<property name="connectionCustomizerClassName" value="com.ohadr.c3p0_test.MyConnectionCustomizer" />
 		<property name="dataSourceName" value="myDataSource" />
 	</bean>
 
