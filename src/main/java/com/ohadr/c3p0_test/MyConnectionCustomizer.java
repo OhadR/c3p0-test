@@ -1,11 +1,8 @@
 package com.ohadr.c3p0_test;
 
 import java.sql.Connection;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import com.mchange.v2.c3p0.ConnectionCustomizer;
 
@@ -36,7 +33,7 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 	@Override
 	public void onCheckOut(Connection c, String parentDataSourceIdentityToken) throws Exception
 	{
-		log.info("onCheckOut");
+		log.debug("onCheckOut");
 
 		Map.Entry<Date, String> entry = new AbstractMap.SimpleEntry<Date, String>(new Date(), getThreadStackTraceAsString());
 		connections.put(c, entry);
@@ -45,7 +42,7 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 	@Override
 	public void onCheckIn(Connection c, String parentDataSourceIdentityToken) throws Exception
 	{
-		log.info("onCheckIn");
+		log.debug("onCheckIn");
 		
 		connections.remove(c);
 	}
@@ -57,7 +54,6 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 		for(StackTraceElement ste : stacktrace)
 		{
 			sb.append(ste.toString());
-			sb.append("\n");
 		}
 		return sb.toString();
 	}
@@ -67,4 +63,32 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
         return Collections.unmodifiableMap( connections );
 	}
 
+	/**
+	 * 
+	 * @param minutes
+	 * @return only the connections that exist in the map more that {minutes} 
+	 */
+	public static final Set<Map.Entry<Date, String>> getConnectionsMap(int minutes)
+	{
+		Set<Map.Entry<Date, String>> retVal = new HashSet<Map.Entry<Date, String>>();
+		
+		Map<Connection, Map.Entry<Date, String>> connectionsCopy = new HashMap<Connection, Map.Entry<Date, String>>( connections );
+		Date now = new Date();
+		for(Map.Entry<Date, String> value : connectionsCopy.values())
+		{
+			Date insertionDate = value.getKey();
+			long insertionTimeMsecs = insertionDate.getTime();
+			long milis = insertionTimeMsecs + TimeUnit.MINUTES.toMillis( minutes );
+			Date insertionDatePlusInterval = new Date( milis ); 
+
+			//if this connection is "checked out" more than <minutes> minutes: 
+			if( now.after( insertionDatePlusInterval ) )
+			{
+				retVal.add(value);
+			}
+		}
+		
+		return retVal;
+
+	}
 }

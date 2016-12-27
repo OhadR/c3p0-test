@@ -1,8 +1,7 @@
 package com.ohadr.c3p0_test.web;
 
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -57,12 +56,21 @@ public class WebController
     	response.getWriter().println( statusJson );    	
     }
     
+    /**
+     * 
+     * @param minutes - Optional parameter (as of spring 4.1.1, using java.util.Optional)
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/connectionsMap", method = RequestMethod.GET)
     protected void getConnectionsMap(
+            @RequestParam("minutes") Optional<Integer> minutes,
     		HttpServletResponse response) throws Exception
     {
-    	Map<Connection, String> map = MyConnectionCustomizer.getConnectionsMap();
-    	String statusJson = JsonUtils.convertToJson( map );
+    	String statusJson;
+    	statusJson = minutes.isPresent() ?
+    			JsonUtils.convertToJson( MyConnectionCustomizer.getConnectionsMap(minutes.get()) ) :
+    			JsonUtils.convertToJson( MyConnectionCustomizer.getConnectionsMap() );
     	response.getWriter().println( statusJson );    	
     }
 }
