@@ -33,16 +33,22 @@ public class Manager implements InitializingBean
 
 	public void runThreads(int numThreads) 
 	{
-		log.info("running " + numThreads + " threads, each one sleeps " + THREAD_SLEEP_TIME_SECONDS + " secs...");
-		for(int i = 0 ; i < numThreads; ++i)
-		{
-			Thread t = new Thread(new DbConnectionUserRunnable(dataSource, THREAD_SLEEP_TIME_SECONDS));
-			t.start();
-		}
-		log.info(numThreads + " threads have started.");
+		runThreads(numThreads, THREAD_SLEEP_TIME_SECONDS);
 	}
 
 
+	public void runThreads(int numThreads, int sleepTimeSeconds)
+	{
+		log.info("running " + numThreads + " threads, each one sleeps " + sleepTimeSeconds + " secs...");
+		for(int i = 0 ; i < numThreads; ++i)
+		{
+			Thread t = new Thread(new DbConnectionUserRunnable(dataSource, sleepTimeSeconds));
+			t.start();
+		}
+		log.info(numThreads + " threads have started.");
+	}	
+
+	
 	private static ConnectionPoolStatus getConnectionPoolStatus(ComboPooledDataSource comboPooledDataSource)
 	{
 		ConnectionPoolStatus connectionPoolStatus = new ConnectionPoolStatus();
@@ -78,7 +84,5 @@ public class Manager implements InitializingBean
 		ComboPooledDataSource comboPooledDataSource = (ComboPooledDataSource)dataSource;
 		return getConnectionPoolStatus(comboPooledDataSource);
 		
-	}	
-	
-
+	}
 }

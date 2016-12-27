@@ -29,9 +29,17 @@ public class WebController
     @RequestMapping(value = "/runThreads", method = RequestMethod.GET)
     protected void getAllWorkoutsNames(
             @RequestParam int numThreads,
-    		HttpServletResponse response) throws Exception
+            @RequestParam("sleepTimeSeconds") Optional<Integer> sleepTimeSeconds,
+            HttpServletResponse response) throws Exception
     {
-    	manager.runThreads(numThreads);
+    	if(sleepTimeSeconds.isPresent())
+    	{
+        	manager.runThreads(numThreads, sleepTimeSeconds.get());
+    	}
+    	else
+    	{
+        	manager.runThreads(numThreads);
+    	}
     	String jsonResponse = "ohads";
     	response.getWriter().println( jsonResponse );    	
     }
