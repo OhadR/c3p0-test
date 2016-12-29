@@ -47,13 +47,14 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 		connections.remove(c);
 	}
 	
-	private String getThreadStackTraceAsString()
+	private static String getThreadStackTraceAsString()
 	{
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		StringBuffer sb = new StringBuffer();
 		for(StackTraceElement ste : stacktrace)
 		{
 			sb.append(ste.toString());
+			sb.append("++");		//mark so it can be replaced later on, to break lines (cannot put now \n)
 		}
 		return sb.toString();
 	}
