@@ -16,6 +16,7 @@ public class Manager implements InitializingBean
 	private static Logger log = Logger.getLogger(Manager.class);
 
 	private final int THREAD_SLEEP_TIME_SECONDS = 15;
+	Runnable ctr;
 
 	@Autowired
 	private DataSource  dataSource;
@@ -25,6 +26,7 @@ public class Manager implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
+		ctr = new ConcurrencyTestsRunnable(dataSource);
 //		addWorkout( new WorkoutMetadata(CftCalcConstants.ANNIE, CftCalcConstants.ANNIE, true) );
 //		addWorkout( new WorkoutMetadata(CftCalcConstants.CINDY, CftCalcConstants.CINDY, true) );
 //		addWorkout( new WorkoutMetadata(CftCalcConstants.BARBARA, CftCalcConstants.BARBARA, true) );
@@ -37,6 +39,13 @@ public class Manager implements InitializingBean
 	}
 
 
+    /**
+     * this method runs 'numThreads' threads, each one takes a connection, sleeps 'sleepTimeSeconds' and releases the connection.
+     * @param numThreads
+     * @param sleepTimeSeconds
+     * @param response
+     * @throws Exception
+     */
 	public void runThreads(int numThreads, int sleepTimeSeconds)
 	{
 		log.info("running " + numThreads + " threads, each one sleeps " + sleepTimeSeconds + " secs...");
@@ -85,4 +94,21 @@ public class Manager implements InitializingBean
 		return getConnectionPoolStatus(comboPooledDataSource);
 		
 	}
+
+
+	public void runConcurrencyTest(int numThreads)
+	{
+		for(int i = 0; i < numThreads; ++i)
+		{
+	        Thread t = new Thread(ctr);
+	        t.start();	        
+		}
+		
+	}
+	
+	public void stopConcurrencyTest()
+	{
+		((ConcurrencyTestsRunnable)ctr).stop();
+	}
+	
 }

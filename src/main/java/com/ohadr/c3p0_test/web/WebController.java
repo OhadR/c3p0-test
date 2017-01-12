@@ -26,6 +26,13 @@ public class WebController
     private Manager manager;
 
 
+    /**
+     * this method runs 'numThreads' threads, each one takes a connection, sleeps 'sleepTimeSeconds' and releases the connection.
+     * @param numThreads
+     * @param sleepTimeSeconds
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/runThreads", method = RequestMethod.GET)
     protected void getAllWorkoutsNames(
             @RequestParam int numThreads,
@@ -80,5 +87,25 @@ public class WebController
     			JsonUtils.convertToJson( MyConnectionCustomizer.getConnectionsMap(minutes.get()) ) :
     			JsonUtils.convertToJson( MyConnectionCustomizer.getConnectionsMap() );
     	response.getWriter().println( statusJson );    	
+    }
+
+    @RequestMapping(value = "/runConcurrencyTest", method = RequestMethod.GET)
+    protected void runConcurrencyTest(
+            @RequestParam int numThreads,
+            HttpServletResponse response) throws Exception
+    {
+       	manager.runConcurrencyTest(numThreads);
+
+    	String jsonResponse = "Concurrent Test is running";
+    	response.getWriter().println( jsonResponse );    	
+    }
+    
+    @RequestMapping(value = "/stopConcurrencyTest", method = RequestMethod.GET)
+    protected void stopConcurrencyTest(HttpServletResponse response) throws Exception
+    {
+       	manager.stopConcurrencyTest();
+
+    	String jsonResponse = "Concurrent Test is stopping";
+    	response.getWriter().println( jsonResponse );    	
     }
 }

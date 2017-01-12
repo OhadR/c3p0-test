@@ -2,6 +2,7 @@ package com.ohadr.c3p0_test;
 
 import java.sql.Connection;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import com.mchange.v2.c3p0.ConnectionCustomizer;
@@ -15,7 +16,8 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 
 	public MyConnectionCustomizer() 
 	{
-		connections = new HashMap<Connection, Map.Entry<Date, String>>();
+		log.info("WhoConnectionCustomizer created");
+		connections = new ConcurrentHashMap<Connection, Map.Entry<Date, String>>();
 	}
 
 	@Override
@@ -26,9 +28,7 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 
 	@Override
 	public void onDestroy(Connection c, String parentDataSourceIdentityToken) throws Exception
-	{
-		log.info("onDestroy");
-	}
+	{}
 
 	@Override
 	public void onCheckOut(Connection c, String parentDataSourceIdentityToken) throws Exception
@@ -44,7 +44,11 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 	{
 		log.debug("onCheckIn");
 		
-		connections.remove(c);
+		Map.Entry<Date, String> value = connections.remove(c);
+		if(value == null)
+		{
+			log.error("tried to remove an item that is not in the map");
+		}
 	}
 	
 	private static String getThreadStackTraceAsString()
@@ -61,7 +65,8 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 	
 	public static final Map<Connection, Map.Entry<Date, String>> getConnectionsMap()
 	{
-        return Collections.unmodifiableMap( connections );
+		log.info(connections.size());
+		return new HashMap<Connection, Map.Entry<Date, String>>(connections);	//clone the map to avoid ConcurrentModificationException
 	}
 
 	/**
@@ -73,6 +78,7 @@ public class MyConnectionCustomizer implements ConnectionCustomizer
 	{
 		Set<Map.Entry<Date, String>> retVal = new HashSet<Map.Entry<Date, String>>();
 		
+		//clone the map to avoid ConcurrentModificationException
 		Map<Connection, Map.Entry<Date, String>> connectionsCopy = new HashMap<Connection, Map.Entry<Date, String>>( connections );
 		Date now = new Date();
 		for(Map.Entry<Date, String> value : connectionsCopy.values())
