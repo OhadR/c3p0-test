@@ -1,14 +1,13 @@
 package com.ohadr.c3p0_test;
 
-import java.sql.SQLException;
-import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.ohadr.c3p0.leak_use_case.AffiliateManager;
-import com.ohadr.common.types.c3p0.ConnectionPoolStatus;
+import com.ohadr.c3p0.leak_use_case.LeakTestRunnable;
 
 
 @Component
@@ -16,11 +15,8 @@ public class LeakTestCaseRunner implements InitializingBean
 {
 	private static Logger log = Logger.getLogger(LeakTestCaseRunner.class);
 
-	private final int THREAD_SLEEP_TIME_SECONDS = 15;
-	Runnable ctr;
-
-	@Autowired
-	private DataSource  dataSource;
+	Runnable ltr;		//LeakTestRunnable
+	private boolean keepRunning = true;
 
 	@Autowired
 	private AffiliateManager affiliateManager;
@@ -30,95 +26,44 @@ public class LeakTestCaseRunner implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		ctr = new ConcurrencyTestsRunnable(dataSource);
-//		addWorkout( new WorkoutMetadata(CftCalcConstants.ANNIE, CftCalcConstants.ANNIE, true) );
-//		addWorkout( new WorkoutMetadata(CftCalcConstants.CINDY, CftCalcConstants.CINDY, true) );
-//		addWorkout( new WorkoutMetadata(CftCalcConstants.BARBARA, CftCalcConstants.BARBARA, true) );
+		ltr = new LeakTestRunnable(affiliateManager);
 	}
 
 
-	public void runThreads(int numThreads) 
+	public class Moshe
 	{
-		runThreads(numThreads, THREAD_SLEEP_TIME_SECONDS);
-	}
+		private List<Integer> strs = new ArrayList<Integer>();
 
-
-    /**
-     * this method runs 'numThreads' threads, each one takes a connection, sleeps 'sleepTimeSeconds' and releases the connection.
-     * @param numThreads
-     * @param sleepTimeSeconds
-     * @param response
-     * @throws Exception
-     */
-	public void runThreads(int numThreads, int sleepTimeSeconds)
-	{
-		log.info("running " + numThreads + " threads, each one sleeps " + sleepTimeSeconds + " secs...");
-		for(int i = 0 ; i < numThreads; ++i)
+		public Moshe(int size)
 		{
-			Thread t = new Thread(new DbConnectionUserRunnable(dataSource, sleepTimeSeconds));
-			t.start();
-		}
-		log.info(numThreads + " threads have started.");
-	}	
-
-	
-	private static ConnectionPoolStatus getConnectionPoolStatus(ComboPooledDataSource comboPooledDataSource)
-	{
-		ConnectionPoolStatus connectionPoolStatus = new ConnectionPoolStatus();
-		try
-		{
-			connectionPoolStatus.dataSourceName = comboPooledDataSource.getDataSourceName();
-			connectionPoolStatus.numBusyConnections = comboPooledDataSource.getNumBusyConnections();
-			connectionPoolStatus.numBusyConnectionsAllUsers = comboPooledDataSource.getNumBusyConnectionsAllUsers();
-
-			connectionPoolStatus.numIdleConnections = comboPooledDataSource.getNumIdleConnections();
-			connectionPoolStatus.numIdleConnectionsAllUsers = comboPooledDataSource.getNumIdleConnectionsAllUsers();
-
-			connectionPoolStatus.numConnections = comboPooledDataSource.getNumConnections();
-			connectionPoolStatus.numConnectionsAllUsers = comboPooledDataSource.getNumConnectionsAllUsers();
-			
-			connectionPoolStatus.numThreadsAwaitingCheckoutDefaultUser = comboPooledDataSource.getNumThreadsAwaitingCheckoutDefaultUser();
-			
-			connectionPoolStatus.numUnclosedOrphanedConnections = comboPooledDataSource.getNumUnclosedOrphanedConnections();
-		}
-		catch (SQLException e1)
-		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			for(int i = 0; i < size; ++i)
+			{
+				strs.add(i);
+			}
 		}
 		
-		return connectionPoolStatus;
+		public List<Integer> getList() 
+		{ 
+			log.info("Moshe getList()");
+			return strs; 
+		}
 		
 	}
-
-
-	public ConnectionPoolStatus getDataSourceStatus()
+	/*
+	 * runs the leak test in loop (for start, do not run many threads)
+	 */
+	public void runLeakTest() throws InterruptedException
 	{
-		ComboPooledDataSource comboPooledDataSource = (ComboPooledDataSource)dataSource;
-		return getConnectionPoolStatus(comboPooledDataSource);
-		
-	}
-
-
-	public void runConcurrencyTest(int numThreads)
-	{
-		for(int i = 0; i < numThreads; ++i)
+		do
 		{
-	        Thread t = new Thread(ctr);
+	        Thread t = new Thread(ltr);
 	        t.start();	        
-		}
-		
+			Thread.sleep(3000);
+		}while(keepRunning);
 	}
 	
-	public void stopConcurrencyTest()
+	public void stopLeakTest()
 	{
-		((ConcurrencyTestsRunnable)ctr).stop();
+		keepRunning = false;
 	}
-
-
-	public void runLeakTestCase()
-	{
-		affiliateManager.getAffiliateActiveSignupCampaign("String");
-	}
-	
 }

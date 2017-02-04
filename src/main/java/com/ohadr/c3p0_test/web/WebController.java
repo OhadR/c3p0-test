@@ -112,11 +112,17 @@ public class WebController
     	response.getWriter().println( jsonResponse );    	
     }
 
-    @RequestMapping(value = "/runLeakTestCase", method = RequestMethod.GET)
-    protected void runLeakTestCase(HttpServletResponse response) throws Exception
+    @RequestMapping(value = "/leakTest", method = RequestMethod.GET)
+    protected void runLeakTestCase(
+            @RequestParam String action,
+    		HttpServletResponse response) throws Exception
     {
-    	leakTestCaseRunner.runLeakTestCase();
+    	if(action.equalsIgnoreCase("START"))
+    		leakTestCaseRunner.runLeakTest(  );
+    	
+    	if(action.equalsIgnoreCase("STOP"))
+        	leakTestCaseRunner.stopLeakTest();
 
-    	response.getWriter().println( "runLeakTestCase" );    	
+    	response.getWriter().println( "LeakTest: " + action );    	
     }
 }

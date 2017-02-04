@@ -54,8 +54,8 @@ public class AffiliateManager
 
 		final Date date = new Date();
 
-		Set<AffiliateCampaignEntity> camps = affiliate.getAffiliateCampaigns();		//leak is here
-		for(AffiliateCampaignEntity ace : camps)
+//		Set<AffiliateCampaignEntity> camps = affiliate.getAffiliateCampaigns();		//leak is here
+		for(AffiliateCampaignEntity ace : affiliate.getAffiliateCampaigns())
 		{
 			CampaignEntity ce = ace.getCampaign();
 			if( isActiveCampaign4Signup(date, ce) )
@@ -88,12 +88,6 @@ public class AffiliateManager
 			}
 		}
 		return active;
-	}
-
-//TODO:
-	public void caller()
-	{
-		CampaignEntity affiliateParentActiveCampaign = getAffiliateActiveSignupCampaign("affiliateName");
 	}
 
 }
