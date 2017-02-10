@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.ohadr.c3p0.leak_use_case.filter.data;
 
 /**

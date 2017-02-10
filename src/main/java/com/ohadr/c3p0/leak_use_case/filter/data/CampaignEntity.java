@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2013, William Hill Online. All rights reserved
- */
 package com.ohadr.c3p0.leak_use_case.filter.data;
 
 import java.io.Serializable;

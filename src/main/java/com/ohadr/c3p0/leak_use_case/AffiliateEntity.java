@@ -1,11 +1,9 @@
-/**
- * Copyright (c) 2016, William Hill Online. All rights reserved
- */
 package com.ohadr.c3p0.leak_use_case;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
@@ -15,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -23,8 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import com.ohadr.c3p0.leak_use_case.affiliate.AffiliateCampaignEntity;
+import com.ohadr.c3p0.leak_use_case.affiliate.AffiliatePropertyEntity;
 import com.ohadr.c3p0.leak_use_case.filter.data.CampaignEntity;
 
 /**
@@ -36,9 +35,8 @@ import com.ohadr.c3p0.leak_use_case.filter.data.CampaignEntity;
 @Entity
 @Table(name = "AFFILIATES", uniqueConstraints = @UniqueConstraint(columnNames = { "NAME" }) )
 @NamedQueries(value = { @NamedQuery(name = "affiliateByName", query = "select a from AffiliateEntity a where a.name = :affiliateName") })
-public class AffiliateEntity implements Serializable
+public class AffiliateEntity
 {
-	private static Logger log = Logger.getLogger(AffiliateEntity.class);
 	private static final long serialVersionUID = -20991134679077561L;
 
 	@Id
@@ -58,6 +56,10 @@ public class AffiliateEntity implements Serializable
 	@Column(name = "UPDATE_DATE", insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "affiliate")
+	@MapKey(name = "name")
+	private Map<String, AffiliatePropertyEntity> affiliateProperties = new HashMap<String, AffiliatePropertyEntity>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "affiliate")
 	private Set<AffiliateCampaignEntity> affiliateCampaigns = new HashSet<AffiliateCampaignEntity>();
@@ -175,13 +177,28 @@ public class AffiliateEntity implements Serializable
 		this.updateDate = updateDate;
 	}
 
+	/**
+	 * @return the affiliateProperties
+	 */
+	public Map<String, AffiliatePropertyEntity> getAffiliateProperties()
+	{
+		return affiliateProperties;
+	}
+
+	/**
+	 * @param affiliateProperties
+	 *            the affiliateProperties to set
+	 */
+	public void setAffiliateProperties(Map<String, AffiliatePropertyEntity> affiliateProperties)
+	{
+		this.affiliateProperties = affiliateProperties;
+	}
 
 	/**
 	 * @return the collections of the affiliate campaigns
 	 */
 	public Set<AffiliateCampaignEntity> getAffiliateCampaigns()
 	{
-		log.info("***** getAffiliateCampaigns() " + affiliateCampaigns.size());
 		return affiliateCampaigns;
 	}
 
@@ -194,6 +211,31 @@ public class AffiliateEntity implements Serializable
 		this.affiliateCampaigns = affiliateCampaigns;
 	}
 
+	/**
+	 * Adds a new or updates existing Affiliate Property.
+	 * 
+	 * @param affiliatePropertyEntity
+	 *            specifies the new Affiliate Property.
+	 */
+	public void addAffiliateProperty(final AffiliatePropertyEntity affiliatePropertyEntity)
+	{
+		if (affiliatePropertyEntity == null)
+		{
+			throw new IllegalArgumentException("affiliatePropertyEntity is null.");
+		}
+
+		// Check, if a property with same name exists already.
+		if (getAffiliateProperties().get(affiliatePropertyEntity.getName()) != null)
+		{
+			throw new IllegalArgumentException("Property with name " + affiliatePropertyEntity.getName() + " exists already.");
+		}
+
+		if (!this.equals(affiliatePropertyEntity.getAffiliate()))
+		{
+			throw new IllegalArgumentException("Property is connected with other AffiliateEntity.");
+		}
+		getAffiliateProperties().put(affiliatePropertyEntity.getName(), affiliatePropertyEntity);
+	}
 
 	/**
 	 * Adds a new campaign to the collection of the campaigns.
@@ -277,7 +319,7 @@ public class AffiliateEntity implements Serializable
 		String affiliateCampaignsText = "null";
 		affiliateCampaignsText = affiliateCampaigns.stream().map(AffiliateCampaignEntity::getCampaign).map(CampaignEntity::getName).collect(Collectors.toList()).toString();
 
-		return "AffiliateEntity [affiliateId=" + affiliateId + ", name=" + name + ", description=" + description + ", insertDate=" + insertDate + ", updateDate=" + updateDate + ", affiliateCampaigns="
+		return "AffiliateEntity [affiliateId=" + affiliateId + ", name=" + name + ", description=" + description + ", insertDate=" + insertDate + ", updateDate=" + updateDate + ", affiliateProperties=" + affiliateProperties + ", affiliateCampaigns="
 				+ affiliateCampaignsText + "]";
 	}
 }

@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2013, William Hill Online. All rights reserved
- */
 package com.ohadr.c3p0.leak_use_case;
 
 import static org.hibernate.criterion.Restrictions.eq;
@@ -20,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Supplies base generic DAO functionality.
- * 
- * @author Yuriy Stul
  * 
  */
 @Transactional
