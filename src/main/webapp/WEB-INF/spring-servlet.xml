@@ -18,8 +18,6 @@
 	<mvc:annotation-driven />
 	<mvc:default-servlet-handler />
 
-	<import resource="component.conf.xml" />
-	
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
 		<property name="jdbcUrl"

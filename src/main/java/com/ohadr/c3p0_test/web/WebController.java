@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.ohadr.c3p0_test.LeakTestCaseRunner;
 import com.ohadr.c3p0_test.Manager;
 import com.ohadr.c3p0_test.MyConnectionCustomizer;
 import com.ohadr.common.types.c3p0.ConnectionPoolStatus;
@@ -26,8 +25,6 @@ public class WebController
     @Autowired
     private Manager manager;
 
-    @Autowired
-    private LeakTestCaseRunner leakTestCaseRunner;
 
     /**
      * this method runs 'numThreads' threads, each one takes a connection, sleeps 'sleepTimeSeconds' and releases the connection.
@@ -110,19 +107,5 @@ public class WebController
 
     	String jsonResponse = "Concurrent Test is stopping";
     	response.getWriter().println( jsonResponse );    	
-    }
-
-    @RequestMapping(value = "/leakTest", method = RequestMethod.GET)
-    protected void runLeakTestCase(
-            @RequestParam String action,
-    		HttpServletResponse response) throws Exception
-    {
-    	if(action.equalsIgnoreCase("START"))
-    		leakTestCaseRunner.runLeakTest(  );
-    	
-    	if(action.equalsIgnoreCase("STOP"))
-        	leakTestCaseRunner.stopLeakTest();
-
-    	response.getWriter().println( "LeakTest: " + action );    	
     }
 }
